@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+    <title>User List for <%=shopName%></title>
+    <link rel="stylesheet"  type="text/css" href="/main.css" />
+</head>
+<body>
+    <h1>User List for <%=shopName%></h1>
+    <ul>
+        <% users.forEach(user => { %>
+            <li>
+                ID: <%= user.id %><br>
+                Username: <%= user.username %><br>
+                First Name: <%= user.first_name %><br>
+                Last Name: <%= user.last_name %><br>
+                Email: <%= user.email %><br>
+            </li>
+        <% }); %>
+    </ul>
+</body>
+</html>
