@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Delete User <%=shopName%></title>
+    <link rel="stylesheet"  type="text/css" href="/main.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1>Delete User for <%=shopName%></h1>
+        <form action="/deleteuser" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            <input type="submit" value="Delete User">
+        </form>
+    </div>
+</body>
+
+</html>

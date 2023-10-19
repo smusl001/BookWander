@@ -15,8 +15,6 @@ module.exports = function(app, shopData) {
     });
     app.get('/search-result', function (req, res) {
         //searching in the database
-        //res.send("You searched for: " + req.query.keyword);
-
         let sqlquery = "SELECT * FROM books WHERE name LIKE '%" + req.query.keyword + "%'"; // query database to get all the books
         // execute sql query
         db.query(sqlquery, (err, result) => {
@@ -122,11 +120,9 @@ module.exports = function(app, shopData) {
         });
     });       
 
-
     app.get('/login', function(req, res) {
         res.render('login.ejs',shopData);
     });
-
 
     app.post('/login', function(req, res) {
         const { username, password } = req.body;
@@ -135,8 +131,8 @@ module.exports = function(app, shopData) {
         const getUserQuery = 'SELECT * FROM users WHERE username = ?';
         db.query(getUserQuery, [username], (err, results) => {
             if (err) {
-                // Handle database error, e.g., redirect back to login with an error message
-                return res.redirect('/loggedin?success=false&error=db');
+                // Handle database error
+                res.send('Handle database error');
             }
 
             // Check if a user with the provided username was found in the database
@@ -147,28 +143,23 @@ module.exports = function(app, shopData) {
                 // Compare the password supplied with the password in the database
                 bcrypt.compare(password, hashedPassword, function(err, passwordMatch) {
                     if (err) {
-                        // Handle bcrypt error, e.g., redirect back to login with an error message
-                        return res.redirect('/loggedin?success=false&error=bcrypt');
+                        res.send('Handle bcrypt error');
                     }
-
                     if (passwordMatch) {
                         // Passwords match, user is authenticated
                         // Redirect to /loggedin with a success message
-                        return res.redirect('/loggedin?success=true');
+                        res.send('Passwords match, user is authenticated');
                     } else {
                         // Passwords do not match, user authentication failed
-                        // Redirect to /loggedin with a failure message
-                        return res.redirect('/loggedin?success=false&error=invalid');
+                        res.send('Passwords do not match, user authentication failed');
                     }
                 });
             } else {
                 // User with the provided username was not found in the database
-                // Redirect to /loggedin with a failure message
-                return res.redirect('/loggedin?success=false&error=notfound');
+                res.send('User with the provided username was not found in the database');
             }
         });
     });
-
 
     app.get('/loggedin', function(req, res) {
         const { success, error } = req.query;
@@ -191,4 +182,27 @@ module.exports = function(app, shopData) {
         }
     });
 
+    app.get('/deleteuser', function(req, res) {
+        res.render('deleteuser.ejs', shopData);
+    });
+    
+    app.post('/deleteuser', function(req, res) {
+        const { username } = req.body;
+    
+        // Query the database to find the user with the provided username
+        const deleteUserQuery = 'DELETE FROM users WHERE username = ?';
+        db.query(deleteUserQuery, [username], (err, result) => {
+            if (err) {
+                return res.redirect('/'); 
+            }
+            // Check if a user with the provided username was found and deleted in the database
+            if (result.affectedRows > 0) {
+                // User deleted successfully
+                res.send('User deleted successfully');
+            } else {
+                // User with the provided username was not found in the database
+                res.send('User with the provided username was not found in the database');
+            }
+        });
+    });
 }
