@@ -64,16 +64,20 @@ module.exports = function(app, shopData) {
     });
 
     app.get('/listusers', function(req, res) {
-        // Query the database to get user details(passwords are not included)
+        // Query the database to get user details (passwords are not included)
         let sqlquery = "SELECT id, username, first_name, last_name, email FROM users";
         db.query(sqlquery, (err, result) => {
             if (err) {
-                res.redirect('./');
+                console.error(err);
+                // Handle the error, e.g., send an error response to the client or redirect to an error page
+                return res.status(500).send('Error fetching user data');
             }
+            // Proceed with rendering the template if there are no errors
             let userData = Object.assign({}, shopData, { users: result });
             res.render("listusers.ejs", userData);
         });
     });
+    
 
     app.get('/list', function(req, res) {
         let sqlquery = "SELECT * FROM books"; // query database to get all the books
