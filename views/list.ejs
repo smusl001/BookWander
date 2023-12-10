@@ -1,16 +1,31 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <title>Welcome to <%=shopName%></title>
-    <link rel="stylesheet"  type="text/css" href="/main.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+
+<body>
     <h1><%=shopName%> Shop</h1>
     <h2>Here are the books that we sell:</h2>
+
+    <form action="/" method="get">
+        <button type="submit">Go back to main menu</button>
+    </form>
+
     <ul>
-      <% availableBooks.forEach(function(book) { %>
-        <li><%= book.name %>, £<%=book.price%> </li>
-      <% }) %>
+        <% availableBooks.forEach(function(book) { %>
+            <li>
+                <%= book.name %>, £<%= book.price %>
+                <form action="/add-to-cart" method="post">
+                    <input type="hidden" name="name" value="<%= book.name %>">
+                    <input type="hidden" name="price" value="<%= book.price %>">
+                    <button type="submit">Add to Cart</button>
+                </form>
+            </li>
+        <% }) %>
     </ul>
-    </body>
+</body>
+
 </html>

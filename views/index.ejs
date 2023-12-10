@@ -1,19 +1,275 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <title>Welcome to <%=shopName%></title>
-    <link rel="stylesheet"  type="text/css" href="/main.css" />
-  </head>
-  <body>
-    <h1>Welcome to <%=shopName%></h1>
-    <p><a href="about">About <%=shopName%></a></p>
-    <p><a href="search">Search for books</a></p>
-    <p><a href="addbook">Add a new book</a></p>
-    <p><a href="list">List books</a></p>
-    <p><a href="bargainbooks">Bargain books</a></p>
-    <p><a href="register">Register with us</a></p>
-    <p><a href="listusers">List Users</a></p>
-    <p><a href="login">Login</a></p>
-    <p><a href="deleteuser">Delete User</a></p>
-  </body>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+
+<body>
+
+    <!-- Promotion Section -->
+    <div class="promotion">
+        <h2>Special Promotion: Buy 5 books, get 1 free! 😊</h2>
+        <p>Explore our vast collection of books and enjoy a free book for every purchase of 5 books.</p>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="header-container">
+        <div class="navigation">
+            <a href="about">About <%=shopName%></a>
+            <a href="addbook">Add book</a>
+            <a href="list">List books</a>
+            <a href="listusers">List Users</a>
+            <a href="random-number-fact">Random Number Fact</a>
+        </div>
+        <div class="navigation top-right">
+            <a href="/shopping-cart">Shopping Cart</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <form action="/search-result" method="get">
+      <input id="search-box" type="text" name="query" placeholder="Search...">
+      <button id="home-search-button" type="submit">Search</button>
+    </form>
+  
+
+    <!-- Types of Books Section -->
+    <div class="book-types">
+        <a href="/booksByGenre?genre=Horror">Horror</a>
+        <a href="/booksByGenre?genre=Classic">Classic</a>
+        <a href="/booksByGenre?genre=Fantasy">Fantasy</a>
+        <a href="/booksByGenre?genre=Adventure Stories">Adventure Stories</a>
+        <a href="/booksByGenre?genre=Romance">Romance</a>
+        <a href="/booksByGenre?genre=Science Fiction">Science Fiction</a>
+        <a href="/booksByGenre?genre=War">War</a>
+        <a href="/booksByGenre?genre=Crime">Crime</a>
+        <a href="/booksByGenre?genre=Fiction">Fiction</a>
+        <a href="/booksByGenre?genre=Biography">Biography</a>
+    </div>
+
+    <h2 class="featured-books-title">Featured Books</h2>
+
+
+    <div class="image-section">
+
+        <form action="/add-to-cart" method="post">
+            <input type="hidden" name="name" value="White Nigts">
+            <input type="hidden" name="image" value="/books/book1.jpg">
+            <input type="hidden" name="price" value="£12.99">
+            <div class="book-item">
+                <img src="/books/book1.jpg" alt="Book Image 1" class="book-image">
+                <p class="book-price">£12.99</p>
+                <button class="add-to-cart-btn" type="submit">Add to Cart</button>
+            </div>
+        </form>
+    
+        <form action="/add-to-cart" method="post">
+            <input type="hidden" name="name" value="Dostoevsky in Love">
+            <input type="hidden" name="image" value="/books/book2.jpg">
+            <input type="hidden" name="price" value="£18.99">
+            <div class="book-item">
+                <img src="/books/book2.jpg" alt="Book Image 2" class="book-image">
+                <p class="book-price">£18.99</p>
+                <button class="add-to-cart-btn" type="submit">Add to Cart</button>
+            </div>
+        </form>
+    
+        <form action="/add-to-cart" method="post">
+            <input type="hidden" name="name" value="Crime of Punishment">
+            <input type="hidden" name="image" value="/books/book3.jpg">
+            <input type="hidden" name="price" value="£29.99">
+            <div class="book-item">
+                <img src="/books/book3.jpg" alt="Book Image 3" class="book-image">
+                <p class="book-price">£29.99</p>
+                <button class="add-to-cart-btn" type="submit">Add to Cart</button>
+            </div>
+        </form>
+
+        <form action="/add-to-cart" method="post">
+            <input type="hidden" name="name" value="To Sleep in a Sea of Stars">
+            <input type="hidden" name="image" value="/books/book4.jpg">
+            <input type="hidden" name="price" value="£17.55">
+            <div class="book-item">
+                <img src="/books/book4.jpg" alt="Book Image 4" class="book-image">
+                <p class="book-price">£17.55</p>
+                <button class="add-to-cart-btn" type="submit">Add to Cart</button>
+            </div>
+        </form>
+
+        <form action="/add-to-cart" method="post">
+            <input type="hidden" name="name" value="Children of Time">
+            <input type="hidden" name="image" value="/books/book5.jpeg">
+            <input type="hidden" name="price" value="£19.99">
+            <div class="book-item">
+                <img src="/books/book5.jpeg" alt="Book Image 5" class="book-image">
+                <p class="book-price">£22.99</p>
+                <button class="add-to-cart-btn" type="submit">Add to Cart</button>
+            </div>
+        </form>
+
+    </div>
+
+        <!-- Book Reviews Section -->
+    <div class="book-reviews-section">
+        <div class="star-reviews">
+            <h3>Books with 5 Star Reviews &#9733;&#9733;&#9733;&#9733;&#9733;</h3>
+            <ul>
+                <!-- Books with 5-star reviews -->
+                <li>Harry Potter and the Philosopher's Stone</li>
+                <li>Our Missing Hearts </li>
+            </ul>
+        </div>
+
+        <div class="star-reviews">
+            <h3>Books with 4 Star Reviews &#9733;&#9733;&#9733;&#9733;</h3>
+            <ul>
+                <!-- Books with 4-star reviews -->
+                <li>Book Title 3 </li>
+                <li>Book Title 4 </li>
+            </ul>
+        </div>
+
+        <div class="star-reviews">
+            <h3>Books with 3 Star Reviews &#9733;&#9733;&#9733;</h3>
+            <ul>
+                <!-- Books with 3-star reviews here -->
+                <li>Book Title 5 </li>
+                <li>Book Title 6 </li>
+            </ul>
+        </div>
+
+        <div class="star-reviews">
+            <h3>Books with 2 Star Reviews &#9733;&#9733;</h3>
+            <ul>
+                <!-- Books with 2-star reviews here -->
+                <li>Book Title 7 </li>
+                <li>Book Title 8 </li>
+            </ul>
+        </div>
+
+        <div class="star-reviews">
+            <h3>Books with 1 Star Reviews &#9733;</h3>
+            <ul>
+                <!-- Books with 1-star reviews here -->
+                <li>Book Title 9 </li>
+                <li>Book Title 10 </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Most Sold Books Section -->
+    <div class="most-sold-books-section">
+        <h2 class="most-sold-books-title">Most Sold Books</h2>
+
+        <div class="book-item">
+            <img src="/books/mostsoldbook1.jpg" alt="Bestseller 1" class="book-image">
+            <div class="book-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="book-price">£24.99</p>
+            <form action="/add-to-cart" method="post">
+                <input type="hidden" name="name" value="Harry Potter and the Philosopher Stone">
+                <input type="hidden" name="image" value="/books/mostsoldbook1.jpg">
+                <input type="hidden" name="price" value="24.99">
+                <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+            </form>
+        </div>
+
+        <div class="book-item">
+            <img src="/books/mostsoldbook2.png" alt="Bestseller 2" class="book-image">
+            <div class="book-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="book-price">£18.79</p>
+            <form action="/add-to-cart" method="post">
+                <input type="hidden" name="name" value="Our Missing Hearts">
+                <input type="hidden" name="image" value="/books/mostsoldbook2.png">
+                <input type="hidden" name="price" value="18.79">
+                <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+            </form>
+        </div>
+        
+        <div class="book-item">
+            <img src="/books/mostsoldbook3.jpg" alt="Bestseller 3" class="book-image">
+            <div class="book-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="book-price">£14.99</p>
+            <form action="/add-to-cart" method="post">
+                <input type="hidden" name="name" value="News of the World">
+                <input type="hidden" name="image" value="/books/mostsoldbook3.jpg">
+                <input type="hidden" name="price" value="14.99">
+                <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+            </form>
+        </div>
+
+        <div class="book-item">
+            <img src="/books/mostsoldbook4.webp" alt="Bestseller 4" class="book-image">
+            <div class="book-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <p class="book-price">$21.99</p>
+            <form action="/add-to-cart" method="post">
+                <input type="hidden" name="name" value="The Top Ten">
+                <input type="hidden" name="image" value="/books/mostsoldbook4.webp">
+                <input type="hidden" name="price" value="21.99">
+                <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+
+        <!-- Latest Books Section -->
+        <div class="latest-books-section">
+            <h2 class="latest-books-title">Latest Books</h2>
+
+            <div class="book-item">
+                <img src="/books/latestbook1.jpg" alt="Latest Book 1" class="book-image">
+                <div class="book-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p class="book-price">£21.99</p>
+                <form action="/add-to-cart" method="post">
+                    <input type="hidden" name="name" value="The New Life">
+                    <input type="hidden" name="image" value="/books/latestbook1.jpg">
+                    <input type="hidden" name="price" value="19.99">
+                    <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+                </form>
+            </div>
+
+            <div class="book-item">
+                <img src="/books/latestbook2.jpg" alt="Latest Book 2" class="book-image">
+                <div class="book-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p class="book-price">£23.99</p>
+                <form action="/add-to-cart" method="post">
+                    <input type="hidden" name="name" value="Coming Up for Air">
+                    <input type="hidden" name="image" value="/books/latestbook2.jpg">
+                    <input type="hidden" name="price" value="19.99">
+                    <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+                </form>
+            </div>
+
+            <div class="coming-soon-section">
+                <p class="coming-soon-notice">Exciting new books are coming to our store on 12/12/2023! Stay tuned!</p>
+            </div>
+        </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-text">
+                <h3>Why Reading is Good?</h3>
+                <p>
+                    Reading stimulates the mind, expands knowledge, and fuels creativity. It's a journey to different worlds and perspectives.
+                    Embrace the joy of reading! Reading enhances cognitive abilities, improves focus, and reduces stress. It opens doors
+                    to new ideas and experiences, fostering empathy and understanding. Make reading a part of your daily routine and
+                    explore the limitless possibilities that books offer.
+                </p>
+            </div>
+        </div>
+        <div class="social-media-links">
+            <h3>Connect with Us</h3>
+            <a href="#" target="_blank"><img src="/books/facebook.png" alt="Facebook" class="social-icon"></a>
+            <a href="#" target="_blank"><img src="/books/twitter.png" alt="Twitter" class="social-icon"></a>
+            <a href="#" target="_blank"><img src="/books/instagram.png" alt="Instagram" class="social-icon"></a>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2023 BookNest. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
 </html>

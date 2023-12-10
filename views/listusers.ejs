@@ -1,25 +1,51 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <title>User List for <%=shopName%></title>
-    <link rel="stylesheet"  type="text/css" href="/main.css" />
+    <title>List Users <%=shopName%></title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
 </head>
+
 <body>
-    <h1>User List for <%=shopName%></h1>
-    <ul>
-        <% if (users && users.length > 0) { %>
-            <% users.forEach(user => { %>
-                <li>
-                    ID: <%= user.id %><br>
-                    Username: <%= user.username %><br>
-                    First Name: <%= user.first_name %><br>
-                    Last Name: <%= user.last_name %><br>
-                    Email: <%= user.email %><br>
-                </li>
-            <% }); %>
-        <% } else { %>
-            <li>No users found.</li>
-        <% } %>
-    </ul>
+    <div class="container">
+        <h1>List of Users for <%=shopName%></h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= user.id %></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.first_name %></td>
+                        <td><%= user.last_name %></td>
+                        <td><%= user.email %></td>
+                        <td>
+                            <% if (loggedInUser === 'Admin123') { %>
+                                <form action="/deleteuser" method="post">
+                                    <input type="hidden" name="username" value="<%= user.username %>">
+                                    <button type="submit">Delete User</button>
+                                </form>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <form action="/" method="get">
+        <button type="submit">Go back to main menu</button>
+    </form>
+
 </body>
 </html>

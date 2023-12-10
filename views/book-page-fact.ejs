@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Book Page Fact</title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+
+<body>
+    <div class="header-container">
+        <div class="navigation">
+            <a href="/">Home</a>
+        </div>
+    </div>
+
+    <h2>Book Page Fact</h2>
+
+    <!-- This code displays error message if it exists -->
+    <% if (error) { %>
+        <p style="color: red;"><%= error %></p>
+    <% } %>
+
+    <!-- This code displays the fact if it exists -->
+    <% if (fact) { %>
+        <p><%= fact %></p>
+        <p>For page number <%= pageNumber %></p>
+    <% } %>
+
+    <!-- Form for entering page number -->
+    <form action="/book-page-fact" method="post">
+        <label for="pageNumber">Enter your book page number:</label>
+        <input type="text" id="pageNumber" name="pageNumber" required>
+        <button type="submit">Get Fact</button>
+    </form>
+</body>
+</html>

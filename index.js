@@ -1,26 +1,40 @@
-// Import the modules we need
+// Importing modules that we need.
 var express = require ('express')
 var ejs = require('ejs')
 var bodyParser= require ('body-parser')
+var session = require ('express-session');
 const mysql = require('mysql');
+const expressSanitizer = require('express-sanitizer');
 
-
-// Create the express application object
+// These are creating the express application object.
 const app = express()
 const port = 8000
 app.use(bodyParser.urlencoded({ extended: true }))
 
-// Set up css
+// This is setting up the CSS.
 app.use(express.static(__dirname + '/public'));
 
-// Define the database connection
+// This is creating a session.
+app.use(session({
+    secret: 'somerandomstuff',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        expires: 600000
+    }
+}));
+
+app.use(expressSanitizer());
+
+// This is defining the database connection.
 const db = mysql.createConnection ({
     host: 'localhost',
     user: 'appuser',
     password: 'app2027',
     database: 'myBookshop'
 });
-// Connect to the database
+
+// Helping connect to the database.
 db.connect((err) => {
     if (err) {
         throw err;
@@ -29,24 +43,32 @@ db.connect((err) => {
 });
 global.db = db;
 
+// Content Security Policy (CSP).
+const helmet = require('helmet');
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+    },
+}));
 
-// Set the directory where Express will pick up HTML files
-// __dirname will get the current directory
+
+
+// This is where Express pick up HTML files.
 app.set('views', __dirname + '/views');
 
-// Tell Express that we want to use EJS as the templating engine
+// This is where we tell Express that we want to use EJS as the templating engine.
 app.set('view engine', 'ejs');
 
-// Tells Express how we should process html files
-// We want to use EJS's rendering engine
+// This is where we tell Express how we should process html files.
 app.engine('html', ejs.renderFile);
 
-// Define our data
-//var shopData = {shopName: "Bertie's Books"}
-var shopData = {shopName: "Bertie's Books Wholesale Shop"}
+// This is where we define our data.
+var shopData = {shopName: "BookNest Book Shop"}
 
-// Requires the main.js file inside the routes folder passing in the Express app and data as arguments.  All the routes will go in this file
+// This is where all the routes will go.
 require("./routes/main")(app, shopData);
 
-// Start the web app listening
+// This is where we start the web app listening.
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

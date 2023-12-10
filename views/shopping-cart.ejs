@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+
+<body>
+    <div class="cart-section">
+        <h2>Shopping Cart</h2>
+        <ul id="cart-items">
+            <% cartItems.forEach((item, index) => { %>
+                <li>
+                    <img src="<%= item.image %>" alt="Book Image" class="review-book-image">
+                    <p class="review-book-name"><%= item.price %></p>
+                    <p class="review-book-name"><%= item.name %></p>
+                    <form action="/remove-from-cart" method="post">
+                        <input type="hidden" name="index" value="<%= index %>">
+                        <button type="submit">Remove</button>
+                    </form>
+
+
+                </li>
+            <% }); %>
+        </ul>
+
+        <p>Total Price: <%= calculateTotalPrice(cartItems) %></p>
+
+        <form action="/" method="get">
+            <button type="submit">Go back to main menu</button>
+        </form>
+        
+
+    </div>
+
+</body>
+
+</html>
