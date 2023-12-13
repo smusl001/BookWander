@@ -39,9 +39,9 @@ module.exports = function(app, shopData) {
         const searchQuery = req.query.query;
         console.log("Search Query:", searchQuery);
     
-        let sqlquery = "SELECT * FROM books WHERE name LIKE '%" + searchQuery + "%'";
-        // execute sql query
-        db.query(sqlquery, (err, result) => {
+        let sqlquery = "SELECT * FROM books WHERE name LIKE ?";
+        // execute sql query with parameterized query
+        db.query(sqlquery, [`%${searchQuery}%`], (err, result) => {
             if (err) {
                 console.error("Database Error:", err);
                 res.redirect('./');
@@ -59,29 +59,29 @@ module.exports = function(app, shopData) {
         res.render('register.ejs', { shopData, shopName: shopData.shopName });
     });
     
-    //This code is for my register form. 
+    // This code is for my register form.
     app.post('/registered', [
         check('email').isEmail().withMessage('Please include @ in the email address'),
         check('password').isLength({ min: 8 }).withMessage('Your password should be at least 8 characters long'),
         check('username').isLength({ min: 8 }).withMessage('Your username should be at least 8 characters long'),
     ], function (req, res) {
         const errors = validationResult(req);
-    
+
         if (!errors.isEmpty()) {
             // Redirect the user back to the register page if there are validation errors
             return res.render('register.ejs', { shopData, shopName: shopData.shopName, errors: errors.array() });
         }
-    
+
         const { username, first, last, email, password } = req.body;
-    
-        // The code checks if the username is already in use.
+
+        // The code checks if the username is already in use using parameterized query.
         const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
         db.query(checkUsernameQuery, [username], (err, usernameResults) => {
             if (err) {
                 // Handle the database error
                 return res.status(500).send('Error checking username availability');
             }
-    
+
             // The code checks if the username is already taken.
             if (usernameResults.length > 0) {
                 return res.render('register.ejs', {
@@ -90,15 +90,15 @@ module.exports = function(app, shopData) {
                     errors: [{ msg: 'Username is already taken. Please choose another username.' }],
                 });
             }
-    
-            // The code checks if the email is already in use.
+
+            // The code checks if the email is already in use using parameterized query.
             const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
             db.query(checkEmailQuery, [email], (err, emailResults) => {
                 if (err) {
                     // Handle the database error
                     return res.status(500).send('Error checking email availability');
                 }
-    
+
                 // Check if the email is already taken
                 if (emailResults.length > 0) {
                     return res.render('register.ejs', {
@@ -107,25 +107,25 @@ module.exports = function(app, shopData) {
                         errors: [{ msg: 'Email is already in use. Please choose another email address.' }],
                     });
                 }
-    
+
                 // This code hash the password using bcrypt.
-                bcrypt.hash(password, saltRounds, function(err, hashedPassword) {
+                bcrypt.hash(password, saltRounds, function (err, hashedPassword) {
                     if (err) {
                         // Handle error, e.g., return an error response to the client
                         return res.status(500).send('Error hashing password');
                     }
-    
-                    // This code inserts data into the users table.
+
+                    // This code inserts data into the users table using parameterized query.
                     const insertUserQuery = 'INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?, ?, ?, ?, ?)';
                     const userData = [username, first, last, email, hashedPassword];
-    
+
                     // This code executes the query to insert user data into the database.
                     db.query(insertUserQuery, userData, (err, result) => {
                         if (err) {
                             // This code returns an error response to the client.
                             return res.status(500).send('Error saving user data');
                         }
-    
+
                         // This code let user know that user successfully inserted the user into the database.
                         let responseMsg = 'Hello ' + req.sanitize(first) + ' ' + req.sanitize(last) + ' you are now registered!  We will send an email to you at ' + req.sanitize(email);
                         res.send(responseMsg);
@@ -134,6 +134,7 @@ module.exports = function(app, shopData) {
             });
         });
     });
+
     
     
     // This code is for listing the users.
@@ -212,77 +213,82 @@ module.exports = function(app, shopData) {
         });
     });      
 
+    //app.get('/already-logged-in', function(req, res) {
+    //    res.send('You are already logged in.');
+    //});
+
     // This code checks if the user logged in.
     app.get('/login', function(req, res) {
         // This code check if the user is already logged in.
         if (req.session.userId) {
             // This code checks if user is already logged in, redirect to another page with a message.
-            return res.redirect('/already-logged-in');
+            return res.render('already-logged-in');
         }
         // User is not logged in, rendering the login page.
         res.render('login.ejs', shopData);
     });
     
-    app.get('/already-logged-in', function(req, res) {
-        res.send('You are already logged in.');
-    });
     
     // This code checks if user logged in.
     app.post('/login', function(req, res) {
         const { username, password } = req.body;
-    
+
         // This code querying the database to find a user with the provided username.
         const getUserQuery = 'SELECT * FROM users WHERE username = ?';
         db.query(getUserQuery, [username], (err, results) => {
             if (err) {
                 console.error('Database query error:', err);
-                return res.redirect('/login?error=database');
+                //return res.redirect('/login?error=database');
+                return res.render('login-not-success');
             }
 
             if (req.session.userId) {
                 // User is already logged in, redirecting to another page.
-                return res.redirect('/loggedin?success=true');
+                return res.render('already-logged-in');
             }
-    
+
             // This code checks if a user with the provided username was found in the database.
             if (results.length > 0) {
                 const user = results[0];
                 const hashedPassword = user.hashedPassword;
-    
+
                 // This code compares the password supplied with the password in the database.
                 bcrypt.compare(password, hashedPassword, function(err, passwordMatch) {
                     if (err) {
                         console.error('Bcrypt error:', err);
-                        return res.redirect('/login?error=bcrypt');
+                        return res.render('login-not-success');
                     }
-    
+
                     if (passwordMatch) {
                         // Passwords match, user is authenticated.
-                        // Set the session variable and redirect to home page.
-                        req.session.userId = user.username; 
-                        req.session.adminPassword = user.hashedPassword; 
-                        res.redirect('/loggedin?success=true');
+                        // Set the session variable.
+                        req.session.userId = user.username;
+                        req.session.adminPassword = user.hashedPassword;
+
+                        // Render the success message directly.
+                        return res.render('login-success', { username: user.username });
                     } else {
                         // Passwords do not match, user authentication failed.
-                        res.redirect('/login?error=invalid');
+                        // res.redirect('/login?error=invalid&success=false');
+			            return res.render('login-not-success');
                     }
                 });
             } else {
                 // User with the provided username was not found in the database.
-                res.redirect('/login?error=notfound');
+                //res.redirect('/login?error=notfound');
+                return res.render('not-in-database');
             }
         });
     });
-    
-    // This code checks in if the user was logged in or not.
+
     app.get('/loggedin', function(req, res) {
         const { success, error } = req.query;
-
+    
         if (success === 'true') {
             // This code displays a success message if login was successful.
             res.send('Login successful! Welcome to the application.');
-            req.session.userId = req.body.username;
-            
+            // Use req.session.userId directly, as req.body is not available in a GET request.
+            // req.session.userId = req.body.username;
         } else if (success === 'false') {
             // This code displays an error message based on the error parameter.
             if (error === 'invalid') {
@@ -297,6 +303,7 @@ module.exports = function(app, shopData) {
             res.redirect('/login');
         }
     });
+    
 
     app.get('/deleteuser',redirectLogin, function(req, res) {
         res.render('deleteuser.ejs', shopData);
@@ -370,7 +377,8 @@ module.exports = function(app, shopData) {
         if (index >= 0 && index < cartItems.length) {
             cartItems.splice(index, 1);
         }
-        res.redirect('/shopping-cart');
+	//res.redirect('/shopping-cart');
+    return res.render('remove-from-cart');
     });
 
     // API

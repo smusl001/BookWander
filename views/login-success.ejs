@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+    <title>Login Successful</title>
+</head>
+<body>
+    <h1>Login successful! Welcome to the application, <%= username %>!</h1>
+    <script>
+        // Redirect to another page after a short delay (e.g., 3 seconds)
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 3000);
+    </script>
+</body>
+</html>
