@@ -1,31 +1,41 @@
-<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Welcome to <%=shopName%></title>
+    <title>Book List <%=shopName%></title>
     <link rel="stylesheet" type="text/css" href="/main.css" />
 </head>
-
 <body>
-    <h1><%=shopName%> Shop</h1>
-    <h2>Here are the books that we sell:</h2>
-
-    <form action="/" method="get">
-        <button type="submit">Go back to main menu</button>
+    <h1>Book List</h1>
+    <form action="/" method="GET">
+        <button type="submit">Back to Main Menu</button>
     </form>
 
+
     <ul>
-        <% availableBooks.forEach(function(book) { %>
+        <% availableBooks.forEach((book, index) => { %>
             <li>
-                <%= book.name %>, £<%= book.price %>
+                <strong><%= book.name %></strong> - <%= book.genre %> - Rating out of 5: <%= book.rating %> <br>
+                Price: <%= book.price %> - Recommendations: <%= book.recommendations %> <br>
+                <!-- Recommend Button -->
+                <form action="/recommend" method="post">
+                    <input type="hidden" name="bookId" value="<%= book.id %>">
+                    <button type="submit">I Recommend This Book</button>
+                </form>
+                <!-- Don't Recommend Button -->
+                <form action="/dontrecommend" method="post">
+                    <input type="hidden" name="bookId" value="<%= book.id %>">
+                    <button type="submit">I Don't Recommend This Book</button>
+                </form>
+                <!-- Add to Cart Button -->
                 <form action="/add-to-cart" method="post">
                     <input type="hidden" name="name" value="<%= book.name %>">
                     <input type="hidden" name="price" value="<%= book.price %>">
+                    <input type="hidden" name="rating" value="<%= book.rating %>">
                     <button type="submit">Add to Cart</button>
                 </form>
             </li>
-        <% }) %>
+        <% }); %>
     </ul>
+    
 </body>
-
 </html>

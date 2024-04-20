@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books You Might Like</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>Books You Might Like</h1>
+    <div class="related-books">
+        <% if (relatedBooks.length > 0) { %>
+            <ul>
+                <% relatedBooks.forEach(book => { %>
+                    <li>
+                        <strong><%= book.name %></strong> - <%= book.genre %> - Rating: <%= book.rating %> <br>
+                        Price: <%= book.price %> - Recommendations: <%= book.recommendations %> <br>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No related books found.</p>
+        <% } %>
+    </div>
+    <a href="/">Back to Main Menu</a>
+</body>
+</html>

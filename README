@@ -1,0 +1,22 @@
+## BookWander Technical Overview
+
+BookWander’s ecosystem consists of a series of interrelated system components, without which the functionality of the whole system wouldn’t be possible or wouldn’t be as good an experience for users.
+
+### Frontend Client
+
+The user interface of BookWander consists of a frontend client – made up of HTML, CSS, and JavaScript – with which users interact, and a backend server that interprets and manages queries and responses sent between the client and the database. React.js or Angular.js techs, for instance, help develop a client-side, visually appealing web application that can respond to users in real-time.
+
+### Backend Server
+
+A Node.js server at the back end —implementing RESTful APIs for client-server communication — powers this platform.
+In this paragraph, the first two sentences refer to the software that a user installs to utilize the capabilities on their device. It is commonly understood that the browser object in the third sentence — running on the device side — would in turn communicate with the Node.js server at the back end.
+
+### Database Management
+
+Another component of BookWander that stores and retrieves information is a relational data-base-management system (RDBMS) – in this application, we used a MySQL database to take advantage of its fast and scalable structure to store items such as user profiles, book catalogue data, reviews and more.
+
+### Technical Architecture
+
+BookWander's technical setup is like a well-written, with carefully crafted designs, smart algorithms, and a web of interconnected parts. This complex system comes together to create a smooth and delightful reading experience for you, our users. It's all about making sure everything runs smoothly and that you have the best possible time using our platform.
+
+In simpler terms, BookWander's tech setup is all about being innovative, reliable, and ready to grow with you. We've built a solid foundation to give you an engaging and immersive reading platform.

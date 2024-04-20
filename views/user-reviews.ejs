@@ -1,0 +1,49 @@
+<!-- user-reviews.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+        <title>Welcome to <%=shopName%></title>
+        <link rel="stylesheet" type="text/css" href="/main.css" />
+    </head>
+    
+</head>
+<body>
+
+    <h2>Add Your Review</h2>
+<form action="/submit-review" method="POST">
+    <label for="user">Your Name:</label><br>
+    <input type="text" id="user" name="user" required><br><br>
+    <label for="book">Book Title:</label><br>
+    <select id="book" name="bookId" required>
+        <option value="" disabled selected>Select Book</option>
+        <% availableBooks.forEach(book => { %>
+            <option value="<%= book.id %>"><%= book.name %></option>
+        <% }); %>
+    </select><br><br>
+    <label for="rating">Rating:</label><br>
+    <input type="number" id="rating" name="rating" min="1" max="5" required><br><br>
+    <label for="comment">Your Review:</label><br>
+    <textarea id="comment" name="comment" rows="4" cols="50" required></textarea><br><br>
+    <button type="submit">Submit Review</button>
+</form>
+
+
+    
+    <h1>User Reviews</h1>
+
+    <% if (reviews && reviews.length) { %>
+        <% reviews.forEach(review => { %>
+            <div class="review-box">
+                <p><strong>User:</strong> <%= review.user %></p>
+                <p><strong>Book Title:</strong> <%= review.bookTitle %></p>
+                <p><strong>Rating:</strong> <%= review.rating %></p>
+                <p><strong>Review:</strong> <%= review.comment %></p>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p>No reviews available.</p>
+    <% } %>
+</body>
+</html>

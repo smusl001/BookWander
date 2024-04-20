@@ -5,7 +5,10 @@ CREATE TABLE books (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50),
     price DECIMAL(5, 2) unsigned,
-    genre VARCHAR(50)
+    genre VARCHAR(50),
+    rating INT
+    recommendations INT DEFAULT 0;
+    dontrecommendations INT DEFAULT 0;
 );
 
 
@@ -16,6 +19,17 @@ CREATE TABLE users (
     last_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
     hashedPassword VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT,
+    bookId INT,
+    rating INT,
+    comment TEXT,
+    FOREIGN KEY (userId) REFERENCES users(id),
+    FOREIGN KEY (bookId) REFERENCES books(id)
 );
 
 

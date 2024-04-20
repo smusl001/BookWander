@@ -22,6 +22,7 @@ module.exports = function(app, shopData) {
     app.get('/about',function(req,res){
         res.render('about.ejs', shopData);
     });
+
     app.get('/search',function(req,res){
         res.render("search.ejs", shopData);
     });
@@ -135,6 +136,54 @@ module.exports = function(app, shopData) {
         });
     });
 
+    app.post('/submit-review', (req, res) => {
+        const { userId, bookId, rating, comment } = req.body; // Assuming 'userId' is passed in the request body
+    
+        // Insert the review into the database
+        const insertReviewQuery = 'INSERT INTO reviews (userId, bookId, rating, comment) VALUES (?, ?, ?, ?)';
+        db.query(insertReviewQuery, [userId, bookId, rating, comment], (err, result) => {
+            if (err) {
+                console.error('Error submitting review:', err);
+                // Handle the error
+                return res.status(500).send('Error submitting review');
+            }
+            // Redirect back to the user reviews page after successful submission
+            res.redirect('/user-reviews');
+        });
+    });
+    
+
+    app.get('/user-reviews', (req, res) => {
+        // Fetch reviews from the database
+        db.query('SELECT * FROM reviews', (err, reviews) => {
+            if (err) {
+                // Handle error if database query fails
+                console.error('Error fetching reviews:', err);
+                res.status(500).send('Error fetching reviews');
+            } else {
+                // Fetch available books from the database
+                db.query('SELECT * FROM books', (err, availableBooks) => {
+                    if (err) {
+                        // Handle error if database query fails
+                        console.error('Error fetching books:', err);
+                        res.status(500).send('Error fetching books');
+                    } else {
+                        // Render the 'user-reviews.ejs' template with reviews and available books
+                        res.render('user-reviews.ejs', { reviews: reviews, availableBooks: availableBooks, shopName: shopData.shopName });
+                    }
+                });
+            }
+        });
+    });
+    
+    
+
+    
+    
+    
+    
+    
+
     
     
     // This code is for listing the users.
@@ -179,22 +228,23 @@ module.exports = function(app, shopData) {
     });
     
     // This code checks if the admin is adding books.
-    app.post('/bookadded', (req, res) => {
-        // This code checks if the logged-in user is an admin.
-        if (req.session.userId !== 'Admin123') {
-            // This code checks if the logged-in user is not an admin, display an error message or redirect as needed.
-            return res.send('You do not have the necessary permissions to add books.');
+app.post('/bookadded', (req, res) => {
+    // This code checks if the logged-in user is an admin.
+    if (req.session.userId !== 'Admin123') {
+        // This code checks if the logged-in user is not an admin, display an error message or redirect as needed.
+        return res.send('You do not have the necessary permissions to add books.');
+    }
+    let sqlquery = "INSERT INTO books (name, price, genre, rating) VALUES (?, ?, ?, ?)";
+    let newrecord = [req.body.name, req.body.price, req.body.genre, req.body.rating];
+    db.query(sqlquery, newrecord, (err, result) => {
+        if (err) {
+            return console.error(err.message);
+        } else {
+            res.send('This book is added to the database, name: ' + req.sanitize(req.body.name) + ' price ' + req.sanitize(req.body.price) + ' genre ' + req.sanitize(req.body.genre) + ' rating ' + req.sanitize(req.body.rating));
         }
-        let sqlquery = "INSERT INTO books (name, price, genre) VALUES (?, ?, ?)";
-        let newrecord = [req.body.name, req.body.price, req.body.genre];
-        db.query(sqlquery, newrecord, (err, result) => {
-            if (err) {
-                return console.error(err.message);
-            } else {
-                res.send('This book is added to the database, name: ' + req.sanitize(req.body.name) + ' price ' + req.sanitize(req.body.price) + ' genre ' + req.sanitize(req.body.genre));
-            }
-        });
     });
+});
+
     
     // This code checks the genre of the books.
     app.get('/booksByGenre', (req, res) => {
@@ -212,6 +262,40 @@ module.exports = function(app, shopData) {
             res.render("list.ejs", newData);
         });
     });      
+
+
+    app.post('/recommend', (req, res) => {
+        const bookId = req.body.bookId;
+    
+        // Update the recommendation count for the book in the database
+        let sqlQuery = "UPDATE books SET recommendations = recommendations + 1 WHERE id = ?";
+        db.query(sqlQuery, [bookId], (err, result) => {
+            if (err) {
+                console.error("Error updating recommendation count:", err);
+                res.status(500).send('Error updating recommendation count');
+            } else {
+                res.redirect('/list');
+            }
+        });
+    });
+    
+    app.post('/dontrecommend', (req, res) => {
+        const bookId = req.body.bookId;
+    
+        // Update the recommendation count for the book in the database
+        let sqlQuery = "UPDATE books SET recommendations = recommendations - 1 WHERE id = ?";
+        db.query(sqlQuery, [bookId], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error updating recommendation count for the book');
+            }
+    
+            // Redirect back to the book list page
+            res.redirect('/list');
+        });
+    });
+    
+    
 
     //app.get('/already-logged-in', function(req, res) {
     //    res.send('You are already logged in.');
@@ -360,16 +444,18 @@ module.exports = function(app, shopData) {
     });
     
     // This code is for shopping cart.
+    // This code is for shopping cart.
     app.post('/add-to-cart', (req, res) => {
         // This code retrieves data from the request body.
-        const { name,image, price } = req.body;
-    
+        const { name, price, rating } = req.body;
+
         // This code adds the item to the cart.
-        cartItems.push({ name,image, price });
-    
+        cartItems.push({ name, price, rating });
+
         // This code redirects back to the home page or shopping cart.
         res.redirect('/');
     });
+
 
     // This code helps user to remove book from cart.
     app.post('/remove-from-cart', (req, res) => {

@@ -15,12 +15,15 @@
                     <img src="<%= item.image %>" alt="Book Image" class="review-book-image">
                     <p class="review-book-name"><%= item.price %></p>
                     <p class="review-book-name"><%= item.name %></p>
+                    <div>
+                        <% for (var i = 0; i < item.rating; i++) { %>
+                            <span>&#9733;</span> <!-- Star character (★) -->
+                        <% } %>
+                    </div>
                     <form action="/remove-from-cart" method="post">
                         <input type="hidden" name="index" value="<%= index %>">
                         <button type="submit">Remove</button>
                     </form>
-
-
                 </li>
             <% }); %>
         </ul>
@@ -30,10 +33,7 @@
         <form action="/" method="get">
             <button type="submit">Go back to main menu</button>
         </form>
-        
-
     </div>
-
 </body>
 
 </html>
