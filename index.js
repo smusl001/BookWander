@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 300, // This code limit each IP to 300 requests per windowMs
+    max: 1000, // This code limit each IP to 1000 requests per windowMs
 });
 
 // These are creating the express application object.
@@ -75,7 +75,7 @@ app.set('view engine', 'ejs');
 app.engine('html', ejs.renderFile);
 
 // This is where we define our data.
-var shopData = {shopName: "BookNest Book Shop"}
+var shopData = {shopName: "BookWander Book Shop"}
 
 // This is where all the routes will go.
 require("./routes/main")(app, shopData);

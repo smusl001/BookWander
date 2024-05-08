@@ -6,9 +6,9 @@ CREATE TABLE books (
     name VARCHAR(50),
     price DECIMAL(5, 2) unsigned,
     genre VARCHAR(50),
-    rating INT
-    recommendations INT DEFAULT 0;
-    dontrecommendations INT DEFAULT 0;
+    rating INT,   --test comma--
+    recommendations INT DEFAULT 0, -- test ,  instead of ; --
+    dontrecommendations INT DEFAULT 0
 );
 
 

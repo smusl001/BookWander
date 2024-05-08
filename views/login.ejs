@@ -7,22 +7,19 @@
 </head>
 
 <body>
-    <h1>Login to <%=shopName%></h1>
-    <form method="POST" action="/login">
-        <p>Username: <input type="text" name="username" /></p>
-        <p>Password: <input type="password" name="password" /></p>
-        <input type="submit" value="Login" />
-    </form>
-
-    <div>
-        <p>Are you not a member? Please click<a id="signup-link" href="/register"><span id="signup-text"> here</span></a> to sign up.</p>
-    </div>
-
-    <script>
-        document.getElementById('signup-link').addEventListener('click', function () {
-            window.location.href = '/register';
-        });
-    </script>
+    <% if (!loggedInUser) { %>
+        <h1>Login to <%=shopName%></h1>
+        <form method="POST" action="/login">
+            <p>Username: <input type="text" name="username" /></p>
+            <p>Password: <input type="password" name="password" /></p>
+            <input type="submit" value="Login" />
+        </form>
+        <div>
+            <p>Are you not a member? Please click<a id="signup-link" href="/register"><span id="signup-text"> here</span></a> to sign up.</p>
+        </div>
+    <% } else { %>
+        <p>You are already logged in as <%= loggedInUser %>. <a href="/logout">Logout</a></p>
+    <% } %>
 
     <form action="/" method="get">
         <button type="submit">Go back to main menu</button>

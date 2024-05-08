@@ -16,9 +16,11 @@ module.exports = function(app, shopData) {
     }
 
     // These are handling the routes.
-    app.get('/',function(req,res){
-        res.render('index.ejs', shopData)
+    app.get('/', function(req, res) {
+        res.render('index.ejs', { shopData, loggedInUser: req.session.userId, shopName: shopData.shopName });
     });
+
+
     app.get('/about',function(req,res){
         res.render('about.ejs', shopData);
     });
@@ -60,30 +62,28 @@ module.exports = function(app, shopData) {
         res.render('register.ejs', { shopData, shopName: shopData.shopName });
     });
     
-    // This code is for my register form.
+    
     app.post('/registered', [
-        check('email').isEmail().withMessage('Please include @ in the email address'),
+        check('email').isEmail().withMessage('Please enter a valid email address'),
         check('password').isLength({ min: 8 }).withMessage('Your password should be at least 8 characters long'),
         check('username').isLength({ min: 8 }).withMessage('Your username should be at least 8 characters long'),
     ], function (req, res) {
         const errors = validationResult(req);
-
+    
         if (!errors.isEmpty()) {
-            // Redirect the user back to the register page if there are validation errors
+            // Render the registration form again with error messages
             return res.render('register.ejs', { shopData, shopName: shopData.shopName, errors: errors.array() });
         }
-
+    
+        // Sanitize user input to prevent XSS attacks
         const { username, first, last, email, password } = req.body;
-
-        // The code checks if the username is already in use using parameterized query.
+    
+        // Check if username is already taken
         const checkUsernameQuery = 'SELECT * FROM users WHERE username = ?';
         db.query(checkUsernameQuery, [username], (err, usernameResults) => {
             if (err) {
-                // Handle the database error
                 return res.status(500).send('Error checking username availability');
             }
-
-            // The code checks if the username is already taken.
             if (usernameResults.length > 0) {
                 return res.render('register.ejs', {
                     shopData,
@@ -91,16 +91,13 @@ module.exports = function(app, shopData) {
                     errors: [{ msg: 'Username is already taken. Please choose another username.' }],
                 });
             }
-
-            // The code checks if the email is already in use using parameterized query.
+    
+            // Check if email is already in use
             const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
             db.query(checkEmailQuery, [email], (err, emailResults) => {
                 if (err) {
-                    // Handle the database error
                     return res.status(500).send('Error checking email availability');
                 }
-
-                // Check if the email is already taken
                 if (emailResults.length > 0) {
                     return res.render('register.ejs', {
                         shopData,
@@ -108,33 +105,32 @@ module.exports = function(app, shopData) {
                         errors: [{ msg: 'Email is already in use. Please choose another email address.' }],
                     });
                 }
-
-                // This code hash the password using bcrypt.
+    
+                // Hash the password
                 bcrypt.hash(password, saltRounds, function (err, hashedPassword) {
                     if (err) {
-                        // Handle error, e.g., return an error response to the client
                         return res.status(500).send('Error hashing password');
                     }
-
-                    // This code inserts data into the users table using parameterized query.
+    
+                    // Insert user data into the database
                     const insertUserQuery = 'INSERT INTO users (username, first_name, last_name, email, hashedPassword) VALUES (?, ?, ?, ?, ?)';
                     const userData = [username, first, last, email, hashedPassword];
-
-                    // This code executes the query to insert user data into the database.
                     db.query(insertUserQuery, userData, (err, result) => {
                         if (err) {
-                            // This code returns an error response to the client.
                             return res.status(500).send('Error saving user data');
                         }
-
-                        // This code let user know that user successfully inserted the user into the database.
-                        let responseMsg = 'Hello ' + req.sanitize(first) + ' ' + req.sanitize(last) + ' you are now registered!  We will send an email to you at ' + req.sanitize(email);
-                        res.send(responseMsg);
+                        // Redirect to the main menu or a confirmation page
+                        res.redirect('/registered-success');
                     });
                 });
             });
         });
     });
+    
+    app.get('/registered-success', function (req, res) {
+        res.render('registered-success.ejs', { shopData, shopName: shopData.shopName });
+    });
+    
 
     app.post('/submit-review', (req, res) => {
         const { userId, bookId, rating, comment } = req.body; // Assuming 'userId' is passed in the request body
@@ -153,39 +149,72 @@ module.exports = function(app, shopData) {
     });
     
 
+    // Fetch user reviews from the database along with usernames and book titles
     app.get('/user-reviews', (req, res) => {
-        // Fetch reviews from the database
-        db.query('SELECT * FROM reviews', (err, reviews) => {
+        // Query to fetch reviews with usernames and book titles
+        const query = `
+            SELECT reviews.*, users.username, books.name AS bookTitle 
+            FROM reviews 
+            INNER JOIN users ON reviews.userId = users.id
+            INNER JOIN books ON reviews.bookId = books.id
+        `;
+        db.query(query, (err, reviews) => {
             if (err) {
-                // Handle error if database query fails
                 console.error('Error fetching reviews:', err);
                 res.status(500).send('Error fetching reviews');
             } else {
                 // Fetch available books from the database
                 db.query('SELECT * FROM books', (err, availableBooks) => {
                     if (err) {
-                        // Handle error if database query fails
-                        console.error('Error fetching books:', err);
-                        res.status(500).send('Error fetching books');
+                        console.error('Error fetching available books:', err);
+                        res.status(500).send('Error fetching available books');
                     } else {
-                        // Render the 'user-reviews.ejs' template with reviews and available books
-                        res.render('user-reviews.ejs', { reviews: reviews, availableBooks: availableBooks, shopName: shopData.shopName });
+                        // Fetch users from the database
+                        db.query('SELECT * FROM users', (err, users) => {
+                            if (err) {
+                                console.error('Error fetching users:', err);
+                                res.status(500).send('Error fetching users');
+                            } else {
+                                // Render user-reviews template with reviews, available books, users, and loggedInUser
+                                res.render('user-reviews.ejs', { reviews: reviews, availableBooks: availableBooks, users: users, loggedInUser: req.session.userId, shopName: shopData.shopName });
+                            }
+                        });
                     }
                 });
+            }
+        });
+    });
+
+
+
+    app.get('/books-you-might-like', (req, res) => {
+        // Retrieve the genres from session
+        const genresOfCart = req.session.cartGenre || []; // Provide a default value of [] if cartGenre is undefined
+        
+        // Fetch available books from the database
+        db.query('SELECT * FROM books', (err, availableBooks) => {
+            if (err) {
+                console.error('Error fetching available books:', err);
+                return res.status(500).send('Error fetching available books');
+            }
+    
+            // Adding available books to shopData
+            shopData.availableBooks = availableBooks;
+    
+            // Filter available books based on the genres of books in the shopping cart
+            const relatedBooks = availableBooks.filter(book => genresOfCart.includes(book.genre));
+    
+            if (relatedBooks && relatedBooks.length > 0) {
+                res.render('books-you-might-like.ejs', { relatedBooks, message: `Related books` });
+            } else {
+                res.render('books-you-might-like.ejs', { relatedBooks: [], message: `No related books found.` });
             }
         });
     });
     
     
 
-    
-    
-    
-    
-    
 
-    
-    
     // This code is for listing the users.
     app.get('/listusers', function(req, res) {
         let sqlquery = "SELECT id, username, first_name, last_name, email FROM users";
@@ -227,23 +256,26 @@ module.exports = function(app, shopData) {
         }
     });
     
-    // This code checks if the admin is adding books.
-app.post('/bookadded', (req, res) => {
-    // This code checks if the logged-in user is an admin.
-    if (req.session.userId !== 'Admin123') {
-        // This code checks if the logged-in user is not an admin, display an error message or redirect as needed.
-        return res.send('You do not have the necessary permissions to add books.');
-    }
-    let sqlquery = "INSERT INTO books (name, price, genre, rating) VALUES (?, ?, ?, ?)";
-    let newrecord = [req.body.name, req.body.price, req.body.genre, req.body.rating];
-    db.query(sqlquery, newrecord, (err, result) => {
-        if (err) {
-            return console.error(err.message);
-        } else {
-            res.send('This book is added to the database, name: ' + req.sanitize(req.body.name) + ' price ' + req.sanitize(req.body.price) + ' genre ' + req.sanitize(req.body.genre) + ' rating ' + req.sanitize(req.body.rating));
-        }
-    });
-});
+        // This code checks if the admin is adding books.
+        app.post('/bookadded', (req, res) => {
+            // Check if the logged-in user is an admin
+            if (req.session.userId !== 'Admin123') {
+                return res.send('You do not have the necessary permissions to add books.');
+            }
+            
+            let sqlquery = "INSERT INTO books (name, price, genre, rating) VALUES (?, ?, ?, ?)";
+            let newrecord = [req.body.name, req.body.price, req.body.genre, req.body.rating];
+            
+            db.query(sqlquery, newrecord, (err, result) => {
+                if (err) {
+                    return console.error(err.message);
+                } else {
+                    // Redirect to the book-added confirmation page with book details
+                    res.render('book-added.ejs', { book: req.body });
+                }
+            });
+        });
+        
 
     
     // This code checks the genre of the books.
@@ -296,75 +328,72 @@ app.post('/bookadded', (req, res) => {
     });
     
     
-
-    //app.get('/already-logged-in', function(req, res) {
-    //    res.send('You are already logged in.');
-    //});
-
     // This code checks if the user logged in.
     app.get('/login', function(req, res) {
-        // This code check if the user is already logged in.
+        // Check if the user is already logged in
         if (req.session.userId) {
-            // This code checks if user is already logged in, redirect to another page with a message.
-            return res.render('already-logged-in');
+            // Redirect to another page or handle the case where the user is already logged in
+            return res.redirect('/');
         }
-        // User is not logged in, rendering the login page.
-        res.render('login.ejs', shopData);
+        
+        // Render the login page, passing loggedInUser and shopName if available
+        res.render('login.ejs', { shopData, loggedInUser: req.session.userId, shopName: shopData.shopName });
+    });
+
+
+    app.get('/login-not-success', function (req, res) {
+        res.render('login-not-success.ejs');
     });
     
     
-    // This code checks if user logged in.
     app.post('/login', function(req, res) {
         const { username, password } = req.body;
-
-        // This code querying the database to find a user with the provided username.
+    
+        // Query the database to find a user with the provided username
         const getUserQuery = 'SELECT * FROM users WHERE username = ?';
         db.query(getUserQuery, [username], (err, results) => {
             if (err) {
                 console.error('Database query error:', err);
-                //return res.redirect('/login?error=database');
-                return res.render('login-not-success');
+                // Render the login-not-success view in case of an error
+                return res.render('login-not-success.ejs');
             }
-
-            if (req.session.userId) {
-                // User is already logged in, redirecting to another page.
-                return res.render('already-logged-in');
-            }
-
-            // This code checks if a user with the provided username was found in the database.
+    
+            // Check if a user with the provided username was found in the database
             if (results.length > 0) {
                 const user = results[0];
                 const hashedPassword = user.hashedPassword;
-
-                // This code compares the password supplied with the password in the database.
+    
+                // Compare the password supplied with the password in the database
                 bcrypt.compare(password, hashedPassword, function(err, passwordMatch) {
                     if (err) {
                         console.error('Bcrypt error:', err);
-                        return res.render('login-not-success');
+                        // Render the login-not-success view in case of an error
+                        return res.render('login-not-success.ejs');
                     }
-
+    
                     if (passwordMatch) {
-                        // Passwords match, user is authenticated.
-                        // Set the session variable.
+                        // Passwords match, user is authenticated
+                        // Set the session variable
                         req.session.userId = user.username;
                         req.session.adminPassword = user.hashedPassword;
-
-                        // Render the success message directly.
-                        return res.render('login-success', { username: user.username });
+    
+                        // Redirect the user to the homepage or any other page
+                        return res.redirect('/');
                     } else {
-                        // Passwords do not match, user authentication failed.
-                        // res.redirect('/login?error=invalid&success=false');
-			            return res.render('login-not-success');
+                        // Passwords do not match, user authentication failed
+                        // Render the login-not-success view for unsuccessful login attempt
+                        return res.render('login-not-success.ejs');
                     }
                 });
             } else {
-                // User with the provided username was not found in the database.
-                //res.redirect('/login?error=notfound');
-                return res.render('not-in-database');
+                // User with the provided username was not found in the database
+                // Render the login-not-success view for unsuccessful login attempt
+                return res.render('login-not-success.ejs');
             }
         });
     });
-
+    
+    
     app.get('/loggedin', function(req, res) {
         const { success, error } = req.query;
     
@@ -421,14 +450,25 @@ app.post('/bookadded', (req, res) => {
         }
     });
     
+    
     app.get('/logout', redirectLogin, (req,res) => {
         req.session.destroy(err => {
-        if (err) {
-          return res.redirect('./')
-        }
-        res.send('you are now logged out. <a href='+'./'+'>Home</a>');
-        })
-    })
+            if (err) {
+                // Handle any errors that occur during session destruction
+                console.error('Error destroying session:', err);
+                return res.status(500).send('Error logging out');
+            }
+            // Redirect the user to a logout confirmation page
+            res.redirect('/logout-confirmation');
+        });
+    });
+
+    
+    app.get('/logout-confirmation', (req, res) => {
+        res.render('logout-confirmation.ejs');
+    });
+
+
 
     // This code calculates the total price of the books in shopping cart.
     function calculateTotalPrice(cartItems) {
@@ -443,18 +483,27 @@ app.post('/bookadded', (req, res) => {
         res.render('shopping-cart', { cartItems, calculateTotalPrice });
     });
     
-    // This code is for shopping cart.
+    
     // This code is for shopping cart.
     app.post('/add-to-cart', (req, res) => {
-        // This code retrieves data from the request body.
-        const { name, price, rating } = req.body;
-
-        // This code adds the item to the cart.
-        cartItems.push({ name, price, rating });
-
-        // This code redirects back to the home page or shopping cart.
+        const { name, price, genre } = req.body;
+    
+        // Initialize cartGenre as an array if it doesn't exist
+        if (!req.session.cartGenre) {
+            req.session.cartGenre = [];
+        }
+    
+        // Add the genre to the array in the session
+        req.session.cartGenre.push(genre);
+    
+        // Add the book to the cart
+        cartItems.push({ name, price, genre });
+    
+        // Redirect back to the home page or shopping cart
         res.redirect('/');
     });
+    
+    
 
 
     // This code helps user to remove book from cart.
@@ -462,10 +511,14 @@ app.post('/bookadded', (req, res) => {
         const index = req.body.index;
         if (index >= 0 && index < cartItems.length) {
             cartItems.splice(index, 1);
+            // Redirect back to the shopping cart page
+            return res.redirect('/shopping-cart');
+        } else {
+            // Handle invalid index
+            return res.status(400).json({ success: false, message: 'Invalid index' });
         }
-	//res.redirect('/shopping-cart');
-    return res.render('remove-from-cart');
     });
+
 
     // API
     app.get('/random-number-fact', async (req, res) => {

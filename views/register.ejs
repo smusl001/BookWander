@@ -7,28 +7,46 @@
 </head>
 
 <body>
-    <h1>Register for <%=shopName%></h1>
-    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
-        <p style="color: red;">Errors:</p>
-        <ul>
-            <% errors.forEach(error => { %>
-                <li><%= error.msg %></li>
-            <% }); %>
-        </ul>
-    <% } %>
-    <form method="POST" action="/registered">
-        <p>First name: <input id="first" type="text" name="first" value="first name" /></p>
-        <p>Last name: <input id="last" type="text" name="last" value="last name" /></p>
-        <p>Email: <input id="email" type="email" name="email" value="email" /></p>
-        <p>Username: <input id="username" type="text" name="username" value="username" /></p>
-        <p>Password: <input id="password" type="password" name="password" value="password" /></p>
-        <input type="submit" value="Register" />
-    </form>
+    <div class="container">
+        <h1>Register for <%=shopName%></h1>
+        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Errors:</h4>
+                <ul>
+                    <% errors.forEach(error => { %>
+                        <li><%= error.msg %></li>
+                    <% }); %>
+                </ul>
+            </div>
+        <% } %>
+        <form method="POST" action="/registered">
+            <div class="form-group">
+                <label for="first">First name</label>
+                <input id="first" class="form-control" type="text" name="first" placeholder="Enter your first name" required />
+            </div>
+            <div class="form-group">
+                <label for="last">Last name</label>
+                <input id="last" class="form-control" type="text" name="last" placeholder="Enter your last name" required />
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" class="form-control" type="email" name="email" placeholder="Enter your email" required />
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" class="form-control" type="text" name="username" placeholder="Choose a username" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" class="form-control" type="password" name="password" placeholder="Enter a password (min. 8 characters)" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
 
-    <form action="/" method="get">
-        <button type="submit">Go back to main menu</button>
-    </form>
-    
+        <form action="/" method="get">
+            <button type="submit" class="btn btn-secondary">Go back to main menu</button>
+        </form>
+    </div>
 </body>
 
 </html>

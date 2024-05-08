@@ -7,6 +7,8 @@
 </head>
 
 <body>
+    
+    
 
     <!-- Promotion Section -->
     <div class="promotion">
@@ -32,6 +34,14 @@
             <a href="/logout">Logout</a>
         </div>
     </div>
+
+    <div class="navigation top-left">
+        <% if (loggedInUser) { %>
+            <p>Welcome, <%= loggedInUser %>!</p>
+        <% } %>
+    </div>
+    
+    
 
     <form action="/search-result" method="get">
       <input id="search-box" type="text" name="query" placeholder="Search...">
@@ -105,7 +115,7 @@
         <form action="/add-to-cart" method="post">
             <input type="hidden" name="name" value="Children of Time">
             <input type="hidden" name="image" value="/books/book5.jpeg">
-            <input type="hidden" name="price" value="£19.99">
+            <input type="hidden" name="price" value="£22.99">
             <div class="book-item">
                 <img src="/books/book5.jpeg" alt="Book Image 5" class="book-image">
                 <p class="book-price">£22.99</p>
@@ -273,7 +283,7 @@
             <a href="#" target="_blank"><img src="/books/instagram.png" alt="Instagram" class="social-icon"></a>
         </div>
         <div class="copyright">
-            <p>&copy; 2023 BookNest. All rights reserved.</p>
+            <p>&copy; 2024 BookWander. All rights reserved.</p>
         </div>
     </footer>
 
